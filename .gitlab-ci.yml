@@ -1,0 +1,33 @@
+Build and Push OCI Image for Client:
+  stage: build
+  tags:
+    - shared
+    - linux
+  image:
+    name: registry.soc-grp.net/library/kaniko-project/executor:v1.22.0-debug
+    entrypoint: [""]
+  script:
+    - echo "{\"auths\":{\"${HARBOR_URL}\":{\"auth\":\"$(printf "%s:%s" "${HARBOR_USERNAME}" "${HARBOR_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - cat /kaniko/.docker/config.json
+    - /kaniko/executor 
+      --context "$CI_PROJECT_DIR/Shopping.Client"
+      --dockerfile "$CI_PROJECT_DIR/Shopping.Client/Dockerfile"
+      --destination "$HARBOR_HOST/$HARBOR_PROJECT/$CI_PROJECT_NAME/client:$CI_COMMIT_REF_NAME"
+      --skip-tls-verify
+
+Build and Push OCI Image for API:
+  stage: build
+  tags:
+    - shared
+    - linux
+  image:
+    name: registry.soc-grp.net/library/kaniko-project/executor:v1.22.0-debug
+    entrypoint: [""]
+  script:
+    - echo "{\"auths\":{\"${HARBOR_URL}\":{\"auth\":\"$(printf "%s:%s" "${HARBOR_USERNAME}" "${HARBOR_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - cat /kaniko/.docker/config.json
+    - /kaniko/executor 
+      --context "$CI_PROJECT_DIR/Shopping.API"
+      --dockerfile "$CI_PROJECT_DIR/Shopping.API/Dockerfile"
+      --destination "$HARBOR_HOST/$HARBOR_PROJECT/$CI_PROJECT_NAME/api:$CI_COMMIT_REF_NAME"
+      --skip-tls-verify
